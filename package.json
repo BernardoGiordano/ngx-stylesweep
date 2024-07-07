@@ -1,0 +1,42 @@
+{
+  "name": "@bernardogiordano/ngx-stylesweep",
+  "version": "1.0.0",
+  "description": "ngx-stylesweep is a command-line tool that removes empty style files from your Angular components.",
+  "main": "./dist/index.js",
+  "files": [
+    "bin",
+    "dist"
+  ],
+  "bin": {
+    "ngx-stylesweep": "bin/cli.js"
+  },
+  "scripts": {
+    "build": "npm run clean && tsc",
+    "clean": "rm -rf ./dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BernardoGiordano/ngx-stylesweep.git"
+  },
+  "keywords": [
+    "angular",
+    "styles",
+    "clean",
+    "empty",
+    "remove"
+  ],
+  "author": "Bernardo Giordano",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/BernardoGiordano/ngx-stylesweep/issues"
+  },
+  "homepage": "https://github.com/BernardoGiordano/ngx-stylesweep",
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "prettier": "^3.3.2",
+    "typescript": "^5.5.3"
+  }
+}
