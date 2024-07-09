@@ -27,9 +27,10 @@ To use `ngx-stylesweep`, run the following command in your project's root direct
 ngx-stylesweep -p /path/to/your/angular/project
 
 Options:
--V, --version      output the version number
--p, --path <path>  Path to the root source directory (default: ".")
--h, --help         display help for command
+  -V, --version      output the version number
+  -p, --path <path>  Path to the root source directory (default: ".")
+  -d, --dry-run      Dry run (no changes will be made) (default: false)
+  -h, --help         display help for command
 ```
 
 ## Contributing
