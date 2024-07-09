@@ -45,7 +45,14 @@ function componentHandler(
       if (stats.size === 0) {
         deletedStylesPaths.add(styleFilePath);
         modifiedComponentFilesPaths.add(componentFilePath);
-        fileContent = fileContent.replace(STYLE_URL_REGEX, '');
+        const replacedComponentBody = originalComponentBody.replace(
+          STYLE_URL_REGEX,
+          ''
+        );
+        fileContent = fileContent.replace(
+          originalComponentBody,
+          replacedComponentBody
+        );
         fs.unlinkSync(styleFilePath);
       }
     } catch (e) {
