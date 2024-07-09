@@ -30,7 +30,8 @@ function traverseDirectory(
 function componentHandler(
   componentFilePath: string,
   fileContent: string,
-  originalComponentBody: string
+  originalComponentBody: string,
+  dryRun: boolean
 ) {
   const styleUrlMatches = originalComponentBody.match(STYLE_URL_REGEX);
   if (!!styleUrlMatches && styleUrlMatches.length > 1) {
@@ -53,7 +54,10 @@ function componentHandler(
           originalComponentBody,
           replacedComponentBody
         );
-        fs.unlinkSync(styleFilePath);
+
+        if (!dryRun) {
+          fs.unlinkSync(styleFilePath);
+        }
       }
     } catch (e) {
       console.error('Unable to access styles file', styleFilePath);
@@ -68,6 +72,7 @@ const program = new Command()
   .version(version)
   .description('Remove empty styles files from Angular components')
   .option('-p, --path <path>', 'Path to the root source directory', '.')
+  .option('-d, --dry-run', 'Dry run (no changes will be made)', false)
   .parse(process.argv);
 
 const options = program.opts();
@@ -76,22 +81,40 @@ traverseDirectory(options.path, filePath => {
   const components = fileContent.match(ANGULAR_COMPONENT_DIRECTIVE);
   if (!!components) {
     components.forEach(component => {
-      fileContent = componentHandler(filePath, fileContent, component);
+      fileContent = componentHandler(
+        filePath,
+        fileContent,
+        component,
+        options.dryRun
+      );
     });
   }
-  fs.writeFileSync(filePath, fileContent);
+
+  if (!options.dryRun) {
+    fs.writeFileSync(filePath, fileContent);
+  }
 });
 
 if (deletedStylesPaths.size + modifiedComponentFilesPaths.size === 0) {
   console.log('👍 No changes!');
 } else {
   deletedStylesPaths.forEach(stylePath =>
-    console.log('Deleted:', path.relative(options.path, stylePath))
+    console.log(
+      'File',
+      options.dryRun ? 'that can be' : '',
+      'deleted:',
+      path.relative(options.path, stylePath)
+    )
   );
   modifiedComponentFilesPaths.forEach(componentPath =>
-    console.log('Modified:', path.relative(options.path, componentPath))
+    console.log(
+      'File',
+      options.dryRun ? 'that can be' : '',
+      'modified:',
+      path.relative(options.path, componentPath)
+    )
   );
   console.log(
-    `🧹 ${deletedStylesPaths.size} files deleted, ${modifiedComponentFilesPaths.size} files modified!`
+    `🧹 ${options.dryRun ? 0 : deletedStylesPaths.size} files deleted, ${options.dryRun ? 0 : modifiedComponentFilesPaths.size} files modified!`
   );
 }
