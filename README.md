@@ -13,13 +13,7 @@ attributes is coming soon.
 
 ## Installation
 
-Install `ngx-stylesweep` in your project as a dev dependency using npm:
-
-```bash
-npm install -D @bernardogiordano/ngx-stylesweep
-```
-
-You can also install it globally:
+Install `ngx-stylesweep` globally using npm:
 
 ```bash
 npm install -g @bernardogiordano/ngx-stylesweep
