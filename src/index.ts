@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { Command } from 'commander';
-import { version } from '../package.json';
+import { version, description } from '../package.json';
 
 const ANGULAR_COMPONENT_DIRECTIVE = /@\s*Component\s*\(\s*\{[^]*?}\s*\)/g;
 const STYLE_URL_REGEX = /[ \t]*styleUrl\s*:\s*['|"](.+)['|"]\s*,?[\n*]?/;
@@ -70,7 +70,7 @@ function componentHandler(
 const program = new Command()
   .name('ngx-stylesweep')
   .version(version)
-  .description('Remove empty styles files from Angular components')
+  .description(description)
   .option('-p, --path <path>', 'Path to the root source directory', '.')
   .option('-d, --dry-run', 'Dry run (no changes will be made)', false)
   .parse(process.argv);
