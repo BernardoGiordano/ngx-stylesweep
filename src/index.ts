@@ -3,6 +3,11 @@ import path from 'path';
 import { Command } from 'commander';
 import { version, description } from '../package.json';
 
+interface ProgramOptions {
+  path: string;
+  dryRun: boolean;
+}
+
 const ANGULAR_COMPONENT_DIRECTIVE = /@\s*Component\s*\(\s*\{[^]*?}\s*\)/g;
 const STYLE_URL_REGEX = /[ \t]*styleUrl\s*:\s*['|"](.+)['|"]\s*,?[\n*]?/;
 
@@ -31,7 +36,7 @@ function componentHandler(
   componentFilePath: string,
   fileContent: string,
   originalComponentBody: string,
-  dryRun: boolean
+  options: ProgramOptions
 ) {
   const styleUrlMatches = originalComponentBody.match(STYLE_URL_REGEX);
   if (!!styleUrlMatches && styleUrlMatches.length > 1) {
@@ -55,7 +60,7 @@ function componentHandler(
           replacedComponentBody
         );
 
-        if (!dryRun) {
+        if (!options.dryRun) {
           fs.unlinkSync(styleFilePath);
         }
       }
@@ -75,7 +80,8 @@ const program = new Command()
   .option('-d, --dry-run', 'Dry run (no changes will be made)', false)
   .parse(process.argv);
 
-const options = program.opts();
+const options = program.opts() as ProgramOptions;
+
 traverseDirectory(options.path, filePath => {
   let fileContent = fs.readFileSync(filePath).toString();
   const components = fileContent.match(ANGULAR_COMPONENT_DIRECTIVE);
@@ -85,7 +91,7 @@ traverseDirectory(options.path, filePath => {
         filePath,
         fileContent,
         component,
-        options.dryRun
+        options
       );
     });
   }
