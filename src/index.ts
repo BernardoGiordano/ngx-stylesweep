@@ -2,10 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import { Command } from 'commander';
 import { description, version } from '../package.json';
-import { Modification, ModifiedFile, ProgramOptions } from './types';
+import { ModifiedFile, ProgramOptions } from './types';
+import { componentHandler } from './program';
 
 const ANGULAR_COMPONENT_DIRECTIVE_REGEX = /@\s*Component\s*\(\s*\{[^]*?}\s*\)/g;
-const STYLE_URL_REGEX = /[ \t]*styleUrl\s*:\s*['|"](.+)['|"]\s*,?[\n*]?/;
 
 const stylePathsToDelete = new Set<string>();
 const componentPathsToModify = new Set<ModifiedFile>();
@@ -26,47 +26,6 @@ function traverseDirectory(
       consumerFn(filePath);
     }
   });
-}
-
-function componentHandler(
-  componentFilePath: string,
-  fileContent: string,
-  originalComponentBody: string
-): Modification | undefined {
-  let modification: Modification | undefined = undefined;
-
-  const styleUrlMatches = originalComponentBody.match(STYLE_URL_REGEX);
-  if (!!styleUrlMatches && styleUrlMatches.length > 1) {
-    const originalStyleUrl = styleUrlMatches[1];
-    const styleFilePath = path.join(
-      path.dirname(componentFilePath),
-      originalStyleUrl
-    );
-
-    try {
-      const stats = fs.statSync(styleFilePath);
-      if (stats.size === 0) {
-        const replacedComponentBody = originalComponentBody.replace(
-          STYLE_URL_REGEX,
-          ''
-        );
-        modification = {
-          component: {
-            path: componentFilePath,
-            content: fileContent.replace(
-              originalComponentBody,
-              replacedComponentBody
-            ),
-          },
-          styles: [styleFilePath],
-        };
-      }
-    } catch (e) {
-      console.error('Unable to access styles file', styleFilePath);
-    }
-  }
-
-  return modification;
 }
 
 function deleteFiles() {
@@ -140,7 +99,12 @@ function main(args: string[]) {
     const components = fileContent.match(ANGULAR_COMPONENT_DIRECTIVE_REGEX);
     if (!!components) {
       components.forEach(component => {
-        const modification = componentHandler(filePath, fileContent, component);
+        const modification = componentHandler(
+          fs.statSync,
+          filePath,
+          fileContent,
+          component
+        );
 
         if (!!modification) {
           componentPathsToModify.add(modification.component);
