@@ -3,7 +3,7 @@ import fs from 'fs';
 import { Modification } from './types';
 import path from 'path';
 
-const STYLE_URL_REGEX = /[ \t]*styleUrl\s*:\s*['|"](.+)['|"]\s*,?[\n*]?/;
+const STYLE_URL_REGEX = /[ \t]*styleUrl\s*:\s*['"`](.+)['"`]\s*,?[\n*]?/;
 
 export function componentHandler(
   statFn: (p: PathLike) => fs.Stats,
@@ -40,7 +40,7 @@ export function componentHandler(
         };
       }
     } catch (e) {
-      console.error('Unable to access styles file', styleFilePath);
+      console.warn('Unable to access styles file', styleFilePath);
     }
   }
 
