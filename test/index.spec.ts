@@ -94,4 +94,22 @@ describe('componentHandler', () => {
     expect(result!.styles.length).toBe(1);
     expect(result!.component.content).not.toContain('styleUrl');
   });
+
+  it('should do nothing when style url is not defined', () => {
+    const componentFilePath = "./src/app/test/test.component.ts";
+    const fileContent = `@Component({
+      selector: 'app-test',
+      templateUrl: './test.component.html',
+    })`;
+    const result = componentHandler(
+      () => {
+        throw new Error('File not found');
+      },
+      componentFilePath,
+      fileContent,
+      fileContent
+    );
+
+    expect(result).toBeUndefined();
+  });
 });
