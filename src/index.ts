@@ -28,14 +28,20 @@ function traverseDirectory(
   });
 }
 
-function deleteFiles() {
+function deleteFiles(options: ProgramOptions) {
   for (const stylePath of stylePathsToDelete) {
+    if (options.verbose) {
+      console.log('🗑 Deleting', stylePath);
+    }
     fs.unlinkSync(stylePath);
   }
 }
 
-function modifyFiles() {
+function modifyFiles(options: ProgramOptions) {
   for (const component of componentPathsToModify) {
+    if (options.verbose) {
+      console.log('🛠 Modifying', component.path);
+    }
     fs.writeFileSync(component.path, component.content);
   }
 }
@@ -55,17 +61,17 @@ function logResults() {
   );
 }
 
-function applyChanges() {
-  deleteFiles();
-  modifyFiles();
+function applyChanges(options: ProgramOptions) {
+  deleteFiles(options);
+  modifyFiles(options);
   console.log(
     `🧹 ${stylePathsToDelete.size} files deleted, ${componentPathsToModify.size} files modified!`
   );
 }
 
-function confirmAndApplyChanges(proceedWithoutConfirmation: boolean) {
-  if (proceedWithoutConfirmation) {
-    applyChanges();
+function confirmAndApplyChanges(options: ProgramOptions) {
+  if (options.yes /* proceed without confirmation */) {
+    applyChanges(options);
   } else {
     console.log(
       '🚨 Are you sure you want to apply changes to the filesystem? (y/n)'
@@ -75,7 +81,7 @@ function confirmAndApplyChanges(proceedWithoutConfirmation: boolean) {
     process.stdin.setEncoding('utf8');
     process.stdin.on('data', (text: string) => {
       if (text === 'y\n') {
-        applyChanges();
+        applyChanges(options);
       } else {
         console.log('🚫 Changes were not applied!');
       }
@@ -92,6 +98,7 @@ function main(args: string[]) {
     .option('-p, --path <path>', 'Path to the root source directory', '.')
     .option('-d, --dry-run', 'Dry run (no changes will be made)', false)
     .option('-y, --yes', 'Automatically apply changes', false)
+    .option('-v, --verbose', 'Verbose output', false)
     .parse(args);
   const options = program.opts() as ProgramOptions;
 
@@ -119,7 +126,7 @@ function main(args: string[]) {
 
   logResults();
   if (!options.dryRun) {
-    confirmAndApplyChanges(options.yes);
+    confirmAndApplyChanges(options);
   }
 }
 

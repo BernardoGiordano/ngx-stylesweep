@@ -50,11 +50,11 @@ function handleStyleUrls(
   originalComponentBody: string,
   originalStyleUrls: string
 ): Modification | undefined {
-  const stylePaths = originalStyleUrls
+  const relativeStylePaths = originalStyleUrls
     .split(',')
     .map(styleUrl => styleUrl.trim().replace(/['"`]/g, ''))
     .filter(styleUrl => !!styleUrl);
-  const stylePathsToKeep = stylePaths.filter(stylePath => {
+  const stylePathsToKeep = relativeStylePaths.filter(stylePath => {
     const realStylePath = path.join(path.dirname(componentFilePath), stylePath);
     try {
       const stats = statFn(realStylePath);
@@ -64,18 +64,18 @@ function handleStyleUrls(
       return true;
     }
   });
-  const stylePathsToRemove = stylePaths.filter(
+  const stylePathsToRemove = relativeStylePaths.filter(
     stylePath => !stylePathsToKeep.includes(stylePath)
   );
 
-  if (stylePathsToKeep.length === stylePaths.length) {
+  if (stylePathsToKeep.length === relativeStylePaths.length) {
     return undefined;
   }
 
   let replacedComponentBody = originalComponentBody;
   if (stylePathsToKeep.length === 0) {
     replacedComponentBody = originalComponentBody.replace(STYLE_URLS_REGEX, '');
-  } else if (stylePathsToKeep.length < stylePaths.length) {
+  } else if (stylePathsToKeep.length < relativeStylePaths.length) {
     replacedComponentBody = originalComponentBody.replace(
       STYLE_URLS_REGEX,
       `styleUrls: [${stylePathsToKeep.map(stylePath => `'${stylePath}'`).join(', ')}],`
@@ -92,7 +92,9 @@ function handleStyleUrls(
         replacedComponentBody
       ),
     },
-    styles: stylePathsToRemove,
+    styles: stylePathsToRemove.map(stylePath =>
+      path.join(path.dirname(componentFilePath), stylePath)
+    ),
   };
 }
 
