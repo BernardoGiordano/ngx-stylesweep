@@ -53,19 +53,24 @@ function handleStyleUrls(
   const stylePaths = originalStyleUrls
     .split(',')
     .map(styleUrl => styleUrl.trim().replace(/['"`]/g, ''))
-    .map(styleUrl => path.join(path.dirname(componentFilePath), styleUrl));
+    .filter(styleUrl => !!styleUrl);
   const stylePathsToKeep = stylePaths.filter(stylePath => {
+    const realStylePath = path.join(path.dirname(componentFilePath), stylePath);
     try {
-      const stats = statFn(stylePath);
+      const stats = statFn(realStylePath);
       return stats.size > 0;
     } catch (e) {
-      console.warn('Unable to access styles file', stylePath);
-      return false;
+      console.warn('Unable to access styles file', realStylePath);
+      return true;
     }
   });
   const stylePathsToRemove = stylePaths.filter(
     stylePath => !stylePathsToKeep.includes(stylePath)
   );
+
+  if (stylePathsToKeep.length === stylePaths.length) {
+    return undefined;
+  }
 
   let replacedComponentBody = originalComponentBody;
   if (stylePathsToKeep.length === 0) {
