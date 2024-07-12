@@ -112,4 +112,23 @@ describe('componentHandler', () => {
 
     expect(result).toBeUndefined();
   });
+
+  it('should return modification object for empty style file when style urls is defined', () => {
+    const componentFilePath = "./src/app/test/test.component.ts";
+    const fileContent = `@Component({
+      selector: 'app-test',
+      templateUrl: './test.component.html',
+      styleUrls: ['./test.component.css']
+    })`;
+    const result = componentHandler(
+      () => ({ size: 0 }) as Stats,
+      componentFilePath,
+      fileContent,
+      fileContent
+    );
+
+    expect(result).toBeTruthy();
+    expect(result!.styles.length).toBe(1);
+    expect(result!.component.content).not.toContain('styleUrls');
+  });
 });
