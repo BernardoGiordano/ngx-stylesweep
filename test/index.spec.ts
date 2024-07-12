@@ -184,7 +184,7 @@ describe('componentHandler', () => {
     expect(result).toBeTruthy();
     expect(result!.styles.length).toBe(1);
     expect(result!.component.content).toContain(
-      "styleUrls: ['./test2.component.css', './test3.component.css']"
+      "styleUrls: ['./test2.component.css', './test3.component.css'],"
     );
   });
 
