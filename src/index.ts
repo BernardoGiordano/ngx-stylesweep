@@ -79,6 +79,7 @@ function confirmAndApplyChanges(proceedWithoutConfirmation: boolean) {
       } else {
         console.log('🚫 Changes were not applied!');
       }
+      process.exit(0);
     });
   }
 }
