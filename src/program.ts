@@ -4,7 +4,7 @@ import { Modification } from './types';
 import path from 'path';
 
 const STYLE_URL_REGEX = /[ \t]*styleUrl\s*:\s*['"`](.+)['"`]\s*,?[\n*]?/;
-const STYLE_URLS_REGEX = /[ \t]*styleUrls\s*:\s*\[(\s*([^\]]+)\s*)],?[\n*]?/;
+const STYLE_URLS_REGEX = /[ \t]*styleUrls\s*:\s*\[(\s*[^\]]+\s*)],?[\n*]?/;
 
 function handleStyleUrl(
   statFn: (p: PathLike) => fs.Stats,
