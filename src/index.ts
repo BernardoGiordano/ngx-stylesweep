@@ -46,19 +46,36 @@ function modifyFiles(options: ProgramOptions) {
   }
 }
 
-function logResults() {
+function min(a: number, b: number) {
+  return a < b ? a : b;
+}
+
+function previewChanges(
+  options: ProgramOptions,
+  array: string[],
+  entityAndAction: string
+) {
+  if (array.length === 0) {
+    return;
+  }
+
+  console.log(`🔍 Found ${array.length} ${entityAndAction}:`);
+  const numberOfFilesToLog = options.verbose
+    ? array.length
+    : min(array.length, 5);
+  for (let i = 0; i < numberOfFilesToLog; i++) {
+    console.log('  -', array[i]);
+  }
+  if (!options.verbose && array.length > 5) {
+    console.log('  and', array.length - 5, 'more...');
+  }
+}
+
+function killProgramIfNoChanges() {
   if (stylePathsToDelete.size + componentPathsToModify.size === 0) {
     console.log('👍 No changes!');
     process.exit(0);
   }
-
-  console.log(
-    '🔍 Found',
-    stylePathsToDelete.size,
-    'style files to delete and',
-    componentPathsToModify.size,
-    'components to modify!'
-  );
 }
 
 function applyChanges(options: ProgramOptions) {
@@ -124,7 +141,18 @@ function main(args: string[]) {
     }
   });
 
-  logResults();
+  killProgramIfNoChanges();
+
+  previewChanges(
+    options,
+    Array.from(stylePathsToDelete),
+    'style files to delete'
+  );
+  previewChanges(
+    options,
+    Array.from(componentPathsToModify).map(mod => mod.path),
+    'component files to modify'
+  );
   if (!options.dryRun) {
     confirmAndApplyChanges(options);
   }
